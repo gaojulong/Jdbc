@@ -10,7 +10,7 @@ import android.util.Log;
 public class JdbcUtils {
 	static String driver = "com.mysql.jdbc.Driver";
 	static String use="long";
-	static   String paw="5664220a";
+	static   String paw="123456";
 	static  String url="jdbc:mysql://123.206.32.248:3306/user?useUnicode=true&characterEncoding=utf-8";
 	static{
 		try {

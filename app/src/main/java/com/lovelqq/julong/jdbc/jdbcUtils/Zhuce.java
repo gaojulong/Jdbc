@@ -76,7 +76,6 @@ public class Zhuce extends Activity {
 			}
 		});
 	}
-
 	private void  init() {
 		zcbt=(Button) findViewById(R.id.btzc);
 		username=(EditText) findViewById(R.id.username);
