@@ -11,6 +11,7 @@ import android.util.Log;
 import com.lovelqq.julong.jdbc.user.Phonenumber;
 import com.lovelqq.julong.jdbc.user.User;
 import com.lovelqq.julong.jdbc.userlogin.Homepage;
+import com.lovelqq.julong.jdbc.userlogin.Zhuce;
 
 public class SqlSentence {
 
@@ -59,8 +60,9 @@ public class SqlSentence {
 		return list;
 	}
 	/**
-	 * 查找用户是否存在
+	 * 查找用户账号和 密码是否匹配
 	 * @param user
+	 * usid返回查到的用户ID
 	 */
 	private static int usid;
 	public static int  loginuser(final User user) {
@@ -152,27 +154,47 @@ public class SqlSentence {
 	/**
 	 * 注册用户
 	 * @param user
+	 * -1表示注册失败
+	 * 1表示已有此用户
+	 * 2表示注册成功
 	 */
-	public static void  insetUser(final User user) {
+	public static void insetUser(final User user) {
 		Thread thread=new Thread(new Runnable() {
 			@Override
 			public void run() {
 				Connection conn=null;
 				PreparedStatement ps=null;
+				ResultSet rs=null;
+				Message msg=new Message();
+				msg.what=1;
 				try {
-					String sql="INSERT INTO login(username,PASSWORD,phonenumber) VALUES(?,?,?)";
+					String sql="SELECT * from login WHERE username=?";
 					conn=JdbcUtils.getconnection();
 					ps=conn.prepareStatement(sql);
-					ps.setString(1, user.getUsername());
-					ps.setString(2, user.getPassword());
-					ps.setLong(3, user.getPhonenumber());
-					int re=ps.executeUpdate();
-					System.out.println("受影响行数"+re);
+					ps.setString(1,user.getUsername());
+					rs=ps.executeQuery();
+					if (rs.next()) {
+						Log.e("用户已经存在","无法注册");
+						msg.arg1=2;
+						Zhuce.handler.sendMessage(msg);
+					}else{
+						String sql1="INSERT INTO login(username,PASSWORD,phonenumber) VALUES(?,?,?)";
+						ps=conn.prepareStatement(sql1);
+						ps.setString(1, user.getUsername());
+						ps.setString(2, user.getPassword());
+						ps.setLong(3, user.getPhonenumber());
+						//受影响的行数
+						int re=ps.executeUpdate();
+						System.out.println("受影响行数"+re);
+						msg.arg1=1;
+						Zhuce.handler.sendMessage(msg);
+					}
+
 				} catch (Exception e) {
 					e.printStackTrace();
 					Log.e("数据库连接", "连接失败");
 				}finally{
-					JdbcUtils.freeResorce(conn, ps, null);
+					JdbcUtils.freeResorce(conn, ps, rs);
 				}
 			}
 		});

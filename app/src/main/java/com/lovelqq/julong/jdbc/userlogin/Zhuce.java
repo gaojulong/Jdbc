@@ -1,7 +1,4 @@
 package com.lovelqq.julong.jdbc.userlogin;
-
-//import com.lovelqq.jdbcUtils.SqlSentence;
-//import com.lovelqq.jdbcUtils.ValidateUserPut;
 import com.lovelqq.julong.jdbc.R;
 import com.lovelqq.julong.jdbc.jdbcUtils.SqlSentence;
 import com.lovelqq.julong.jdbc.user.User;
@@ -12,6 +9,8 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,12 +20,12 @@ import android.widget.Toast;
 public class Zhuce extends Activity {
 	private Button zcbt;
 	private EditText username,password,password1,phonenumber;
-	private Context context=this;
-	Intent intent;
+	private static  Context context;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.zhuce);
+		context=getApplicationContext();
 		init();
 		zcbt.setOnClickListener(new OnClickListener() {
 			@Override
@@ -36,7 +35,6 @@ public class Zhuce extends Activity {
 				strpassword=password.getText().toString();
 				strpassword1=password1.getText().toString();
 				strphonenumber=phonenumber.getText().toString();
-
 				if(strphonenumber.equals(""))
 				{
 					strphonenumber="0";
@@ -48,7 +46,7 @@ public class Zhuce extends Activity {
 					case 1:
 						User user=new User(strusername,strpassword,Long.parseLong(strphonenumber));
 						SqlSentence.insetUser(user);
-						Toast.makeText(context, "注册成功", Toast.LENGTH_LONG).show();
+						//Toast.makeText(context, "注册成功", Toast.LENGTH_LONG).show();
 						break;
 					case 2:
 						Toast.makeText(context, "用户名不能为空", Toast.LENGTH_SHORT).show();
@@ -68,7 +66,7 @@ public class Zhuce extends Activity {
 						Log.e("检查注册", "手机号为空");
 						user=new User(strusername,strpassword,Long.parseLong(strphonenumber));
 						SqlSentence.insetUser(user);
-						Toast.makeText(Zhuce.this, "注册成功", Toast.LENGTH_LONG).show();
+						//Toast.makeText(Zhuce.this, "注册成功", Toast.LENGTH_LONG).show();
 						break;
 					case 8:
 						Toast.makeText(context, "手机号格式不正确", Toast.LENGTH_LONG).show();
@@ -80,6 +78,25 @@ public class Zhuce extends Activity {
 			}
 		});
 	}
+
+	public static Handler handler=new Handler(){
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			switch (msg.what){
+				case 1:
+					switch (msg.arg1) {
+						case 1:
+							Toast.makeText(context, "注册成功", Toast.LENGTH_LONG).show();
+							break;
+						case 2:
+							Toast.makeText(context, "已有次用户，注册失败", Toast.LENGTH_LONG).show();
+							break;
+					}
+					break;
+			}
+		}
+	};
 	private void  init() {
 		zcbt=(Button) findViewById(R.id.btzc);
 		username=(EditText) findViewById(R.id.username);
