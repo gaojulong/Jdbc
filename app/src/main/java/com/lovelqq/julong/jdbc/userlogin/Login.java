@@ -1,10 +1,5 @@
 package com.lovelqq.julong.jdbc.userlogin;
 
-//import com.lovelqq.jdbcUtils.SqlSentence;
-//import com.lovelqq.jdbcUtils.ValidateUserPut;
-//import com.lovelqq.user.Phonenumber;
-//import com.lovelqq.user.User;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,8 +24,6 @@ public class Login extends Activity implements OnClickListener{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
 		init();
-		//ArrayList<User>list=selectAll();//显示所有数据
-
 	}
 	private void init() {
 		// TODO Auto-generated method stub

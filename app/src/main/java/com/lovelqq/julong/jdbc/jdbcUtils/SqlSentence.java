@@ -154,9 +154,8 @@ public class SqlSentence {
 	/**
 	 * 注册用户
 	 * @param user
-	 * -1表示注册失败
-	 * 1表示已有此用户
-	 * 2表示注册成功
+	 * 2表示已有此用户
+	 * 1表示注册成功
 	 */
 	public static void insetUser(final User user) {
 		Thread thread=new Thread(new Runnable() {
