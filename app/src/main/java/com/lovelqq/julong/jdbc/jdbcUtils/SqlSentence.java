@@ -11,7 +11,10 @@ import android.util.Log;
 import com.lovelqq.julong.jdbc.user.Phonenumber;
 import com.lovelqq.julong.jdbc.user.User;
 import com.lovelqq.julong.jdbc.userlogin.Homepage;
+import com.lovelqq.julong.jdbc.userlogin.Login;
 import com.lovelqq.julong.jdbc.userlogin.Zhuce;
+
+import javax.security.auth.login.LoginException;
 
 public class SqlSentence {
 
@@ -19,7 +22,7 @@ public class SqlSentence {
 	public static ArrayList<Phonenumber> numberAllConten (  ) {
 
 		final ArrayList<Phonenumber> list = new ArrayList<Phonenumber>();
-		Homepage homepage=new Homepage();
+		//Homepage homepage=new Homepage();
 		Thread thread=new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -65,6 +68,7 @@ public class SqlSentence {
 	 * usid返回查到的用户ID
 	 */
 	private static int usid;
+    private  static Login login=new Login();
 	public static int  loginuser(final User user) {
 		Thread thread=new Thread(new Runnable() {
 			@Override
@@ -72,6 +76,10 @@ public class SqlSentence {
 				Connection conn=null;
 				PreparedStatement ps=null;
 				ResultSet rs=null;
+
+				//定义msg，发送id到Login里
+				Message msg=new Message();
+				msg.what=1;//获取用户id
 				usid=-1;
 				try {
 					String sql="SELECT * from login WHERE username=? and password=?";
@@ -84,9 +92,13 @@ public class SqlSentence {
 						usid=rs.getInt("userid");
 						User.setLogin_flay(1);
 						Log.e("登录", "登录成功");
-
+						//发送
+						msg.arg1=usid;
+						login.handlerLogin.sendMessage(msg);
 					}else{
+					    msg.arg1=-1;
 						Log.e("登录", "登录失败");
+                        login.handlerLogin.sendMessage(msg);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -200,33 +212,36 @@ public class SqlSentence {
 		thread.start();
 	}
 	/**
-	 * 插入手机号
-	 * @param phonenumber
+	 * 上传手机号
+	 * @param
 	 */
-	public static void  insetPhoneNumber(final Phonenumber phonenumber) {
-		Thread thread=new Thread(new Runnable() {
-			@Override
-			public void run() {
-				Connection conn=null;
-				PreparedStatement ps=null;
-				try {
-					String sql="INSERT INTO phonenumber (userid,username,phonenumber)VALUES(?,?,?)";
-					conn=JdbcUtils.getconnection();
-					ps=conn.prepareStatement(sql);
-					ps.setInt(1, phonenumber.getUserid());
-					ps.setString(2,phonenumber.getUsername());
-					ps.setString(3, phonenumber.getPhonenumber());
-					int re=ps.executeUpdate();
-					System.out.println("受影响行数"+re);
-				} catch (Exception e) {
-					e.printStackTrace();
-					Log.e("数据库连接", "连接失败");
-				}finally{
-					JdbcUtils.freeResorce(conn, ps, null);
-				}
-			}
-		});
-		thread.start();
-	}
+    public static void  insetPhoneNumber(final ArrayList<Phonenumber> Phonenumber) {
+        Thread thread=new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Connection conn=null;
+                PreparedStatement ps=null;
+                try {
+                    for (Phonenumber phone:Phonenumber)
+                    {
+                        String sql="INSERT INTO phonenumber (userid,username,phonenumber)VALUES(?,?,?)";
+                        conn=JdbcUtils.getconnection();
+                        ps=conn.prepareStatement(sql);
+                        ps.setInt(1, phone.getUserid());
+                        ps.setString(2,phone.getUsername());
+                        ps.setString(3, phone.getPhonenumber());
+                        int re=ps.executeUpdate();
+                        Log.e("插入手机号","受影响行数"+re);
+                    }
 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("数据库连接", "连接失败");
+                }finally{
+                    JdbcUtils.freeResorce(conn, ps, null);
+                }
+            }
+        });
+        thread.start();
+    }
 }

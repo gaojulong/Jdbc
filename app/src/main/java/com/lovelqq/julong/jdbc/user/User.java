@@ -3,7 +3,7 @@ package com.lovelqq.julong.jdbc.user;
 public class User {
 	
 	private static int login_flay;
-	public static  int id;
+	public static  int id=-1;
 	private  String username;
 	private  String password;
 	private  String password1;

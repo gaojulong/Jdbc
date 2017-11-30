@@ -7,6 +7,7 @@ import com.lovelqq.julong.jdbc.user.User;
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 public class Homepage extends Activity {
 	//是否已经上传标志
 	private static boolean threadRun=false;
+	public static Context context;
 	//上传按钮,下载按钮
 	Button btsc,btxz;
 	private static TextView tv;
@@ -49,8 +51,6 @@ public class Homepage extends Activity {
 				//	SqlSentence.numberAllConten();
 				if(threadRun==false){
 					tv.setText("正在同步.......");
-					//threadUpload.start();
-					//th.start();
 					update();
 				}else {
 					Toast.makeText(Homepage.this, "本次已经同步完成", Toast.LENGTH_SHORT).show();
@@ -179,6 +179,8 @@ public class Homepage extends Activity {
 			ArrayList<Phonenumber>location1=gethostuser();
 			//列出在云端查到的联系人,写入前先判断手机里是否已经存在
 			ArrayList<Phonenumber> yunlist1=SqlSentence.numberAllConten();
+			//存放云数据库中没有，将要上传的的联系人
+			ArrayList<Phonenumber> differentarr=new ArrayList<Phonenumber>();
 			//判断上传的条数
 			int upconint=0;
 			for(Phonenumber loca:location1){
@@ -198,13 +200,14 @@ public class Homepage extends Activity {
 					Log.e("云端联系人已存在",loca.getUsername() + loca.getPhonenumber());
 
 				}else {
-					//把为在云端数据库中查到的号码上传
+					//把不在云数据库的号码上传
 					Phonenumber phonenumber1=new Phonenumber(User.getId(),loca.getUsername(),  loca.getPhonenumber());
-					SqlSentence.insetPhoneNumber(phonenumber1);
+					differentarr.add(phonenumber1);
+					//					SqlSentence.insetPhoneNumber(phonenumber1);//上传通讯录
 					upconint++;
-					//上传通讯录
 				}
 			}
+			SqlSentence.insetPhoneNumber(differentarr);
 			Message msg=new Message();
 			msg.what=1;
 			msg.arg1=upconint;
@@ -216,51 +219,6 @@ public class Homepage extends Activity {
 		}
 	}
 
-	//上传通讯
-	Thread   threadUpload=new Thread(new Runnable() {
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			int userid=User.getId();
-			//判断云数据库里是否手机号已经存在，不存在则上传
-			 boolean validate_flag=false;
-			Cursor cursor=getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null,
-					null, null, null);
-
-			while (cursor.moveToNext()) {
-				String contactId=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-				String name=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-				Cursor phones=getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-						null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID+"="+contactId, null, null);
-				//每个用户可能有多个手机号
-				while(phones.moveToNext())
-				{
-					String PhNumber=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-					Log.e("Hpmepage", name+"电话号码："+PhNumber);
-					Phonenumber phonenumber=new Phonenumber(name, PhNumber);
-					//查询号码在数据库是否已经存在，查询到返回true
-					validate_flag=SqlSentence.validatePhone(phonenumber);
-					//判断云数据库是都已经存在
-					if(validate_flag){
-						Log.e("Homepage", "号码已经存在");
-						//把标示变为false
-						validate_flag=false;
-					}else{
-						//把为在云端数据库中查到的号码上传
-						Phonenumber phonenumber1=new Phonenumber(userid, name, PhNumber);
-						SqlSentence.insetPhoneNumber(phonenumber1);
-						//上传数加一
-						conten++;
-					}
-				}
-			}
-			cursor.close();
-			Message msg=new Message();
-			msg.what=1;
-			handler.sendMessage(msg);
-			threadRun=true;
-		}
-	});
 	@Override
 	protected void onPause() {
 		super.onPause();

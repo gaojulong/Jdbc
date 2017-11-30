@@ -1,8 +1,11 @@
 package com.lovelqq.julong.jdbc.userlogin;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,11 +21,13 @@ import com.lovelqq.julong.jdbc.user.User;
 public class Login extends Activity implements OnClickListener{
 	private Button loginbt,zhucebt,zhaohuibt;
 	private EditText edusernaem,edpassword;
+	private static Context context;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
+		context=getApplicationContext();
 		init();
 	}
 	private void init() {
@@ -94,5 +99,29 @@ public class Login extends Activity implements OnClickListener{
 				break;
 		}
 	}
+	public  Handler handlerLogin=new Handler(){
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			switch (msg.what){
+				case 1:
+					Log.e("msg",""+msg.arg1);
+					User.id=msg.arg1;
+					Log.e("登录获取","userid"+User.getId()+"在线标识"+User.getLogin_flay());
+					if (User.id!=-1) {
+//						Intent intent = new Intent(context, Homepage.class);
+//						startActivity(intent);
+					}
+					else {
+						Toast.makeText(context,"登录失败",Toast.LENGTH_SHORT).show();
+					}
+
+					break;
+				default:
+					break;
+			}
+		}
+	};
+
 
 }

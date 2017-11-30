@@ -22,7 +22,7 @@
             android:text="用户名："/>
         <EditText
             android:id="@+id/loginusername"
-            android:text="root"
+            android:text="lqq"
             android:layout_width="150dp"
             android:layout_height="wrap_content" />
     </LinearLayout>
