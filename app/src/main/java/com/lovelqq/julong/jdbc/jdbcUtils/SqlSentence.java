@@ -74,8 +74,6 @@ public class SqlSentence {
 					ps.setString(2, user.getPassword());
 					rs=ps.executeQuery();
 					if (rs.next()) {
-						//user.setId(rs.getInt("userid"));
-						//改变用户的id
 						usid=rs.getInt("userid");
 						User.setLogin_flay(1);
 						Log.e("登录", "登录成功");
