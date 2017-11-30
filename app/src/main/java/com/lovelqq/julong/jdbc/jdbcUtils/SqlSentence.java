@@ -17,7 +17,6 @@ import com.lovelqq.julong.jdbc.userlogin.Zhuce;
 import javax.security.auth.login.LoginException;
 
 public class SqlSentence {
-
 	//云端联系人
 	public static ArrayList<Phonenumber> numberAllConten (  ) {
 
