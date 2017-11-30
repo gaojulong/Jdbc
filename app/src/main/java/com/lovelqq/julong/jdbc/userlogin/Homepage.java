@@ -4,7 +4,6 @@ import com.lovelqq.julong.jdbc.R;
 import com.lovelqq.julong.jdbc.user.Phonenumber;
 import com.lovelqq.julong.jdbc.jdbcUtils.SqlSentence;
 import com.lovelqq.julong.jdbc.user.User;
-
 import android.app.Activity;
 import android.content.ContentUris;
 import android.content.ContentValues;
