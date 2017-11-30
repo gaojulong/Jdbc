@@ -1,8 +1,11 @@
-package com.lovelqq.julong.jdbc.jdbcUtils;
+package com.lovelqq.julong.jdbc.userlogin;
 
 //import com.lovelqq.jdbcUtils.SqlSentence;
 //import com.lovelqq.jdbcUtils.ValidateUserPut;
 import com.lovelqq.julong.jdbc.R;
+import com.lovelqq.julong.jdbc.jdbcUtils.SqlSentence;
+import com.lovelqq.julong.jdbc.user.User;
+import com.lovelqq.julong.jdbc.jdbcUtils.ValidateUserPut;
 //import com.lovelqq.user.User;
 
 import android.os.Bundle;

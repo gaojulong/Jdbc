@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import android.os.Message;
 import android.util.Log;
 
+import com.lovelqq.julong.jdbc.user.Phonenumber;
+import com.lovelqq.julong.jdbc.user.User;
+import com.lovelqq.julong.jdbc.userlogin.Homepage;
+
 public class SqlSentence {
 
 	//云端联系人
@@ -25,7 +29,7 @@ public class SqlSentence {
 					String sql="SELECT * from phonenumber WHERE userid=?";
 					conn=JdbcUtils.getconnection();
 					ps=conn.prepareStatement(sql);
-					ps.setInt(1,User.getId());
+					ps.setInt(1, User.getId());
 					rs=ps.executeQuery();
 					while (rs.next()) {
 						Phonenumber phonenumber=new Phonenumber();
