@@ -49,7 +49,9 @@ public class Homepage extends Activity {
 				//	SqlSentence.numberAllConten();
 				if(threadRun==false){
 					tv.setText("正在同步.......");
-					threadUpload.start();
+					//threadUpload.start();
+					//th.start();
+					update();
 				}else {
 					Toast.makeText(Homepage.this, "本次已经同步完成", Toast.LENGTH_SHORT).show();
 				}
@@ -163,6 +165,56 @@ public class Homepage extends Activity {
 			}
 		cursor.close();
 		return list;
+	}
+	//上传线程
+	Thread update=new Thread(new Runnable() {
+		@Override
+		public void run() {
+
+		}
+	});
+	//上传通讯录
+	public  void  update(){
+		try {
+			//查询本地联系人
+			ArrayList<Phonenumber>location1=gethostuser();
+			//列出在云端查到的联系人,写入前先判断手机里是否已经存在
+			ArrayList<Phonenumber> yunlist1=SqlSentence.numberAllConten();
+			//判断上传的条数
+			int upconint=0;
+			for(Phonenumber loca:location1){
+				//是否本地存在用户
+				boolean flag=false;
+				Log.e("云端联系人", loca.getUsername()+loca.getPhonenumber());
+				for(Phonenumber yun:yunlist1)
+				{
+					//判断如果本地不存在此联系人或者手机号不一样则写入本地通讯录
+					if(loca.getPhonenumber()==yun.getPhonenumber()||loca.getUsername()==yun.getUsername());
+					{
+						flag=true;
+						break;
+					}
+				}
+				if(flag){
+					Log.e("云端联系人已存在",loca.getUsername() + loca.getPhonenumber());
+
+				}else {
+					//把为在云端数据库中查到的号码上传
+					Phonenumber phonenumber1=new Phonenumber(User.getId(),loca.getUsername(),  loca.getPhonenumber());
+					SqlSentence.insetPhoneNumber(phonenumber1);
+					upconint++;
+					//上传通讯录
+				}
+
+			}
+			Message msg=new Message();
+			msg.what=1;
+			handler.sendMessage(msg);
+			threadRun=true;
+			Log.e("上传多少条记录：",""+upconint);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	//上传通讯
 	Thread   threadUpload=new Thread(new Runnable() {

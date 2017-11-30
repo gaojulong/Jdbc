@@ -65,9 +65,11 @@ public class Login extends Activity implements OnClickListener{
 		//判断用户输入是否合法
 		int i=ValidateUserPut.login(strname,strpassw);
 		switch (i) {
+			//返回1用户名和密码输入合法
 			case 1:
 				User user=new User(strname,strpassw);
-				SqlSentence.loginuser(user);
+				//在这给查找用户id，复制给User.id
+				User.id=SqlSentence.loginuser(user);
 				Log.e("登录获取","userid"+User.getId()+"在线标识"+User.getLogin_flay());
 				Intent intent=new Intent(Login.this,Homepage.class);
 				startActivity(intent);

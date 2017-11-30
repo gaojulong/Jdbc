@@ -58,7 +58,8 @@ public class SqlSentence {
 	 * 查找用户是否存在
 	 * @param user
 	 */
-	public static void   loginuser(final User user) {
+	private static int usid;
+	public static int  loginuser(final User user) {
 		Thread thread=new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -73,9 +74,12 @@ public class SqlSentence {
 					ps.setString(2, user.getPassword());
 					rs=ps.executeQuery();
 					if (rs.next()) {
-						user.setId(rs.getInt("userid"));
+						//user.setId(rs.getInt("userid"));
+						//改变用户的id
+						usid=rs.getInt("userid");
 						User.setLogin_flay(1);
 						Log.e("登录", "登录成功");
+
 					}else{
 						Log.e("登录", "登录失败");
 					}
@@ -88,13 +92,54 @@ public class SqlSentence {
 			}
 		});
 		thread.start();
+
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return usid;
 	}
+//	public static void   loginuser(final User user) {
+//		Thread thread=new Thread(new Runnable() {
+//			@Override
+//			public void run() {
+//				Connection conn=null;
+//				PreparedStatement ps=null;
+//				ResultSet rs=null;
+//				try {
+//					String sql="SELECT * from login WHERE username=? and password=?";
+//					conn=JdbcUtils.getconnection();
+//					ps=conn.prepareStatement(sql);
+//					ps.setString(1,user.getUsername());
+//					ps.setString(2, user.getPassword());
+//					rs=ps.executeQuery();
+//					if (rs.next()) {
+//						//user.setId(rs.getInt("userid"));
+//						//改变用户的id
+//						User.id=rs.getInt("userid");
+//						User.setLogin_flay(1);
+//						Log.e("登录", "登录成功");
+//					}else{
+//						Log.e("登录", "登录失败");
+//					}
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					Log.e("数据库连接", "连接失败");
+//				}finally{
+//					JdbcUtils.freeResorce(conn, ps, rs);
+//				}
+//			}
+//		});
+//		thread.start();
+//		try {
+//			thread.join();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 	/**
 	 * 判断手机号是否已经存在返回布尔类型
 	 */
