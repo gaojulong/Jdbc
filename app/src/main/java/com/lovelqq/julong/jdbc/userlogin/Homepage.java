@@ -204,7 +204,6 @@ public class Homepage extends Activity {
 					upconint++;
 					//上传通讯录
 				}
-
 			}
 			Message msg=new Message();
 			msg.what=1;
