@@ -41,6 +41,7 @@ public class Zhuce extends Activity {
 				{
 					strphonenumber="0";
 				}
+				//输入检测是否合法
 				int i=	ValidateUserPut.zhuce(strusername, strpassword, strpassword1,Long.parseLong(strphonenumber));
 				Log.e("注册验证返回值",""+i);
 				switch (i) {

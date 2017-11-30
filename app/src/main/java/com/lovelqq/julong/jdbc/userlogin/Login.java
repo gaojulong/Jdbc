@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import com.lovelqq.julong.jdbc.R;
 import com.lovelqq.julong.jdbc.jdbcUtils.SqlSentence;
 import com.lovelqq.julong.jdbc.jdbcUtils.ValidateUserPut;
@@ -74,8 +76,13 @@ public class Login extends Activity implements OnClickListener{
 				//在这给查找用户id，复制给User.id
 				User.id= SqlSentence.loginuser(user);
 				Log.e("登录获取","userid"+User.getId()+"在线标识"+User.getLogin_flay());
-				Intent intent=new Intent(Login.this,Homepage.class);
-				startActivity(intent);
+				if (User.id!=-1) {
+					Intent intent = new Intent(Login.this, Homepage.class);
+					startActivity(intent);
+				}
+				else {
+					Toast.makeText(Login.this,"登录失败",Toast.LENGTH_SHORT).show();
+				}
 				break;
 			case 2:
 				Log.e("验证登录", "用户名不能为空");
@@ -94,4 +101,5 @@ public class Login extends Activity implements OnClickListener{
 				break;
 		}
 	}
+
 }

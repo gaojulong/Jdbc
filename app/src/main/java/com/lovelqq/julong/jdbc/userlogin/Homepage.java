@@ -34,7 +34,6 @@ public class Homepage extends Activity {
 	Button btsc,btxz;
 	private static TextView tv;
 	static int conten=0;//同步个数
-	int yunconten=0;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -43,8 +42,6 @@ public class Homepage extends Activity {
 		tv=(TextView) findViewById(R.id.tv);
 		SqlSentence.numberAllConten();
 		init();
-
-
 		//上传按钮
 		btsc.setOnClickListener(new OnClickListener() {
 			@Override
@@ -103,6 +100,8 @@ public class Homepage extends Activity {
 			}
 		});
 	}
+
+
 
 	public static Handler handler=new Handler(){
 		public void handleMessage(android.os.Message msg) {
@@ -263,5 +262,12 @@ public class Homepage extends Activity {
 			threadRun=true;
 		}
 	});
+	@Override
+	protected void onPause() {
+		super.onPause();
+		User.id=-1;
+		threadRun=false;//清除上传表示，如果不清除，第一次登录成功后，第二次将无法上传
+		Log.e("清除id","清除id");
+	}
 
 }

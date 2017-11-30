@@ -70,6 +70,7 @@ public class SqlSentence {
 				Connection conn=null;
 				PreparedStatement ps=null;
 				ResultSet rs=null;
+				usid=-1;
 				try {
 					String sql="SELECT * from login WHERE username=? and password=?";
 					conn=JdbcUtils.getconnection();
