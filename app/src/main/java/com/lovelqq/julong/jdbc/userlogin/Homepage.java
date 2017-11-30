@@ -215,6 +215,7 @@ public class Homepage extends Activity {
 			e.printStackTrace();
 		}
 	}
+
 	//上传通讯
 	Thread   threadUpload=new Thread(new Runnable() {
 		@Override
