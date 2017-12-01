@@ -60,49 +60,19 @@ public class Homepage extends Activity {
 		btxz.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-
+			    Message msg=new Message();
+			    msg.what=3;
 				//添加向手机号添加手机号
 				try {
-					//查询本地联系人
-					ArrayList<Phonenumber>location=gethostuser();
-					//列出在云端查到的联系人,写入前先判断手机里是否已经存在
-					ArrayList<Phonenumber> yunlist=SqlSentence.numberAllConten();
-					//存放云端和手机本地不同的联系人
-					ArrayList<Phonenumber> differentarr=new ArrayList<Phonenumber>();
-					//判断写入的条数
-					int conint=0;
-					for(Phonenumber u:yunlist){
-						//是否本地存在用户
-						boolean flag=false;
-						Log.e("云端联系人", u.getUsername()+u.getPhonenumber());
-							for(Phonenumber locu:location)
-							{
-								//判断如果本地不存在此联系人或者手机号不一样则写入本地通讯录
-								if(u.getPhonenumber()==locu.getPhonenumber()&&u.getUsername()==locu.getUsername());
-								{
-									flag=true;
-                                    Log.e("通讯已存在",locu.getUsername() + locu.getPhonenumber());
-									break;
-								}
-							}
-							if(flag){
-//								Log.e("通讯已存在",u.getUsername() + u.getPhonenumber());
-
-							}else {
-								//addLocalhostUser(u.getUsername(), u.getPhonenumber());
-                                Phonenumber phonenumber=new Phonenumber(u.getUsername(), u.getPhonenumber());
-                                differentarr.add(phonenumber);
-								Log.e("写入的", u.getUsername() + u.getPhonenumber());
-								conint++;//写入的条数加1
-							}
-
-						}
-						//不同的联系人
-                    for (Phonenumber phonenumber:differentarr)
-                    {
-                        Log.e("不同的联系人",phonenumber.getUsername()+phonenumber.getPhonenumber());
-                    }
-						Log.e("写入多少条记录：",""+conint);
+				    //接收需要写入的联系人
+				   ArrayList<Phonenumber> arrayList= downloadDiff();
+				   //需要写入的条数
+                    int contint=0;
+                    contint=arrayList.size();
+                    msg.arg1=contint;
+                    handler.sendMessage(msg);
+                    //把联系人添加到本地
+                    addLocalhostUser(arrayList);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -123,7 +93,11 @@ public class Homepage extends Activity {
 					int ind=msg.arg1;
 					tv.setText("云端记录"+ ind+"条");
 					break;
-				case 3:
+                case 3:
+                    int i=msg.arg1;
+                    tv.setText("本次恢复"+i+"条");
+                    break;
+				case 4:
 					tv.setText("正在同步.......");
 					break;
 				default:
@@ -136,62 +110,17 @@ public class Homepage extends Activity {
 		btsc=(Button) findViewById(R.id.btsc);
 		btxz= (Button) findViewById(R.id.btxz);
 	}
-	//向手机里添加联系人
-	public void  addLocalhostUser( String usernaem ,String phonenumber) throws Exception{
-		ContentValues values=new ContentValues();
-		Uri rawContacturi =getContentResolver().insert(RawContacts.CONTENT_URI, values);
-		long rawContactId=ContentUris.parseId(rawContacturi);
-		values.clear();
-		values.put(Data.RAW_CONTACT_ID, rawContactId);
-		//设置内容类型
-		values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
-		//设置联系人名字
-		values.put(StructuredName.GIVEN_NAME, usernaem);
-		//向联系人Uri添加联系人名字
-		getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
-		values.clear();
-		values.put(Data.RAW_CONTACT_ID, rawContactId);
-		values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
-		//设置联系人电话号码
-		values.put(Phone.NUMBER, phonenumber);
-		//设置电话类型
-		values.put(Phone.TYPE, Phone.TYPE_MOBILE);
-		getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
-		Log.e("联系人插入", "插入成功");
-	}
-	//获取本地联系人
-	public ArrayList<Phonenumber> gethostuser(){
-		int con=0;
-		ArrayList<Phonenumber> list = new ArrayList<Phonenumber>();
-		Cursor cursor=getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null,
-				null, null, null);
 
-		while (cursor.moveToNext()) {
-			String contactId=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-			String name=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-			Cursor phones=getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-					null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID+"="+contactId, null, null);
-			//每个用户可能有多个手机号
-			while(phones.moveToNext())
-			{
-				String PhNumber=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-				//Log.e("Hpmepage", name+"电话号码："+PhNumber);
-				Phonenumber phonenumber=new Phonenumber(name, PhNumber);
-				list.add(phonenumber);
-				con++;
-			}
-			}
-		cursor.close();
-		Log.e("本地联系人","读取"+con+"条记录");
-		return list;
-	}
 	//上传通讯录
 	public  void  update(){
+	    //接受上传的联系人
+        ArrayList<Phonenumber>arrayList=upDiff();
 		try {
             int upconint=0;
-            upconint=updiff().size();
+            //上传的人数
+            upconint=arrayList.size();
             //把数组里联系人上传
-			SqlSentence.insetPhoneNumber(updiff());
+			SqlSentence.insetPhoneNumber(arrayList);
 			Message msg=new Message();
 			msg.what=1;
 			msg.arg1=upconint;
@@ -201,8 +130,55 @@ public class Homepage extends Activity {
 			e.printStackTrace();
 		}
 	}
-	//查找出需要上传联系人
-        public ArrayList<Phonenumber> updiff(){
+
+    /**
+     *查找本地和云端不同的联系人，去掉本地已有的联系人
+     * @return 需要写入到本地的联系人
+     */
+
+	    public ArrayList<Phonenumber> downloadDiff(){
+            //查询本地联系人
+            ArrayList<Phonenumber>location1=gethostuser();
+            //列出在云端查到的联系人,写入前先判断手机里是否已经存在
+            ArrayList<Phonenumber> yunlist1=SqlSentence.numberAllConten();
+            //存放云数据库中没有，将要上传的的联系人
+            ArrayList<Phonenumber> differentarr=new ArrayList<Phonenumber>();
+            //判断写入的条数
+            int upconint=0;
+            boolean flag=false;
+            //查找出手机里不存在的联系人
+            for (int i=0;i<yunlist1.size();i++)
+            {
+                flag=false;
+                for (int j=0;j<location1.size();j++)
+                {
+                    if(yunlist1.get(i).getUsername().equals(location1.get(j).getUsername())&&
+                            yunlist1.get(i).getPhonenumber().equals(location1.get(j).getPhonenumber()))
+                    {
+                        flag=true;
+                        break;
+                    }
+                }
+                if (flag==true)
+                {
+                    //Log.e("联系人在本地已经存在",location1.get(i).getUsername()+ location1.get(i).getPhonenumber());
+                }
+                else {
+                    //把不在云数据库的号码上传
+                    Phonenumber phonenumber1 = new Phonenumber(yunlist1.get(i).getUsername(), yunlist1.get(i).getPhonenumber());
+                    differentarr.add(phonenumber1);
+                    upconint++;
+                }
+            }
+            Log.e("需要写入到本地的联系人的数量：","需要写入"+upconint+"个");
+            return differentarr;
+        }
+
+    /**
+     * 查处云端和手机里联系人不相同的，去掉云端已有的联系人
+     * @return需要上传联系人返回数组
+     */
+        public ArrayList<Phonenumber> upDiff(){
             //查询本地联系人
             ArrayList<Phonenumber>location1=gethostuser();
             //列出在云端查到的联系人,写入前先判断手机里是否已经存在
@@ -239,6 +215,66 @@ public class Homepage extends Activity {
             Log.e("需要上传联系人的数量：","需要上传"+upconint+"个");
             return differentarr;
         }
+
+    /**
+     * 添加手机联系人
+     * @throws Exception
+     */
+    public void  addLocalhostUser( ArrayList<Phonenumber> phonenumbers) throws Exception{
+        for (Phonenumber phonenumber:phonenumbers)
+        {
+            ContentValues values=new ContentValues();
+            Uri rawContacturi =getContentResolver().insert(RawContacts.CONTENT_URI, values);
+            long rawContactId=ContentUris.parseId(rawContacturi);
+            values.clear();
+            values.put(Data.RAW_CONTACT_ID, rawContactId);
+            //设置内容类型
+            values.put(Data.MIMETYPE, StructuredName.CONTENT_ITEM_TYPE);
+            //设置联系人名字
+            values.put(StructuredName.GIVEN_NAME,phonenumber.getUsername());
+            //向联系人Uri添加联系人名字
+            getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
+            values.clear();
+            values.put(Data.RAW_CONTACT_ID, rawContactId);
+            values.put(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE);
+            //设置联系人电话号码
+            values.put(Phone.NUMBER, phonenumber.getPhonenumber());
+            //设置电话类型
+            values.put(Phone.TYPE, Phone.TYPE_MOBILE);
+            getContentResolver().insert(android.provider.ContactsContract.Data.CONTENT_URI, values);
+            Log.e("联系人插入", "插入成功"+phonenumber.getPhonenumber()+phonenumber.getUsername());
+        }
+
+    }
+    /**
+     * 读取本地联系人
+     * @return 查到的联系人以数组返回
+     */
+    public ArrayList<Phonenumber> gethostuser(){
+        int con=0;
+        ArrayList<Phonenumber> list = new ArrayList<Phonenumber>();
+        Cursor cursor=getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, null,
+                null, null, null);
+
+        while (cursor.moveToNext()) {
+            String contactId=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+            String name=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+            Cursor phones=getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID+"="+contactId, null, null);
+            //每个用户可能有多个手机号
+            while(phones.moveToNext())
+            {
+                String PhNumber=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                //Log.e("Hpmepage", name+"电话号码："+PhNumber);
+                Phonenumber phonenumber=new Phonenumber(name, PhNumber);
+                list.add(phonenumber);
+                con++;
+            }
+        }
+        cursor.close();
+        Log.e("本地联系人","读取"+con+"条记录");
+        return list;
+    }
 
 
 	@Override

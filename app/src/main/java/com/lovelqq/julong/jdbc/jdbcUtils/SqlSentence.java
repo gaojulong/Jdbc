@@ -21,7 +21,6 @@ public class SqlSentence {
 	public static ArrayList<Phonenumber> numberAllConten (  ) {
 
 		final ArrayList<Phonenumber> list = new ArrayList<Phonenumber>();
-		//Homepage homepage=new Homepage();
 		Thread thread=new Thread(new Runnable() {
 			@Override
 			public void run() {
