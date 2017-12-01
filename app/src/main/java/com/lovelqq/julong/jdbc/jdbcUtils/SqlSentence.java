@@ -213,9 +213,17 @@ public class SqlSentence {
             public void run() {
                 Connection conn=null;
                 PreparedStatement ps=null;
+                //正在上传的个数
+                int i=0;
+
                 try {
                     for (Phonenumber phone:Phonenumber)
                     {
+                        Message msg=new Message();
+                        msg.what=4;
+                        msg.arg1=i;
+                        msg.arg2=Phonenumber.size();
+                        Homepage.handler.sendMessage(msg);
                         String sql="INSERT INTO phonenumber (userid,username,phonenumber)VALUES(?,?,?)";
                         conn=JdbcUtils.getconnection();
                         ps=conn.prepareStatement(sql);
@@ -224,7 +232,14 @@ public class SqlSentence {
                         ps.setString(3, phone.getPhonenumber());
                         int re=ps.executeUpdate();
                         Log.e("插入手机号","受影响行数"+re);
+                        i++;//同步个数+1
+
                     }
+                    Message msg1=new Message();
+                    msg1.what=1;
+                    msg1.arg1=Phonenumber.size();
+                    Homepage.handler.sendMessage(msg1);
+
 
                 } catch (Exception e) {
                     e.printStackTrace();

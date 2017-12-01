@@ -9,6 +9,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -87,7 +88,8 @@ public class Homepage extends Activity {
 			switch (msg.what) {
 				case 1:
 					int conte=msg.arg1;
-					tv.setText("本次同步"+conte+"条记录");
+					tv.setTextColor(0xFF528B8B);
+					tv.setText("同步完成\n本次上传"+conte+"条");
 					break;
 				case 2:
 					int ind=msg.arg1;
@@ -95,10 +97,14 @@ public class Homepage extends Activity {
 					break;
                 case 3:
                     int i=msg.arg1;
+                    tv.setTextColor(0xFF528B8B);
                     tv.setText("本次恢复"+i+"条");
                     break;
 				case 4:
-					tv.setText("正在同步.......");
+                    tv.setTextColor(0xFF8B7765);
+				    int i1=msg.arg1;//正在更新的条数
+                    int i2=msg.arg2;//传来需要更新的条数
+					tv.setText("本次更新"+i2+"条"+"已经上传"+i1+"条");
 					break;
 				default:
 					break;
@@ -117,15 +123,16 @@ public class Homepage extends Activity {
         ArrayList<Phonenumber>arrayList=upDiff();
 		try {
             int upconint=0;
+            threadRun=true;//表示本次已经上传，防止线程再次打开
             //上传的人数
             upconint=arrayList.size();
             //把数组里联系人上传
 			SqlSentence.insetPhoneNumber(arrayList);
-			Message msg=new Message();
-			msg.what=1;
-			msg.arg1=upconint;
-			handler.sendMessage(msg);
-			threadRun=true;
+//			Message msg=new Message();
+//			msg.what=1;
+//			msg.arg1=upconint;
+//			handler.sendMessage(msg);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -265,7 +272,6 @@ public class Homepage extends Activity {
             while(phones.moveToNext())
             {
                 String PhNumber=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                //Log.e("Hpmepage", name+"电话号码："+PhNumber);
                 Phonenumber phonenumber=new Phonenumber(name, PhNumber);
                 list.add(phonenumber);
                 con++;
