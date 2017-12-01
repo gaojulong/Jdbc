@@ -28,4 +28,5 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
     compile files('libs/mysql-connector-java-5.1.35-bin.jar')
+    implementation files('libs/open_sdk_r5886_lite.jar')
 }

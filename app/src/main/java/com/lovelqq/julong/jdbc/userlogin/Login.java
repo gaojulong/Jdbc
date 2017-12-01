@@ -19,7 +19,7 @@ import com.lovelqq.julong.jdbc.jdbcUtils.ValidateUserPut;
 import com.lovelqq.julong.jdbc.user.User;
 
 public class Login extends Activity implements OnClickListener{
-	private Button loginbt,zhucebt,zhaohuibt;
+	private Button loginbt,zhucebt,zhaohuibt,qqlogin;
 	private EditText edusernaem,edpassword;
 	private static Context context;
 	@Override
@@ -37,10 +37,13 @@ public class Login extends Activity implements OnClickListener{
 		zhaohuibt=(Button) findViewById(R.id.zhaohuibt);
 		edusernaem=(EditText) findViewById(R.id.loginusername);
 		edpassword=(EditText) findViewById(R.id.loginpassword);
+		qqlogin= (Button) findViewById(R.id.loginQqbt);
 
 		loginbt.setOnClickListener(this);
 		zhucebt.setOnClickListener(this);
 		zhaohuibt.setOnClickListener(this);
+		qqlogin.setOnClickListener(this);
+
 
 	}
 	@Override
@@ -57,10 +60,20 @@ public class Login extends Activity implements OnClickListener{
 			case R.id.loginbt:
 				login();
 				break;
+			case R.id.loginQqbt:
+				//第三方QQ登录
+				qqlogin();
+				break;
 
 			default:
 				break;
 		}
+	}
+	//第三方QQ登录
+	private void qqlogin(){
+
+
+
 	}
 	private void  login() {
 		String strname=edusernaem.getText().toString();
@@ -99,29 +112,5 @@ public class Login extends Activity implements OnClickListener{
 				break;
 		}
 	}
-	public  Handler handlerLogin=new Handler(){
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			switch (msg.what){
-				case 1:
-					Log.e("msg",""+msg.arg1);
-					User.id=msg.arg1;
-					Log.e("登录获取","userid"+User.getId()+"在线标识"+User.getLogin_flay());
-					if (User.id!=-1) {
-//						Intent intent = new Intent(context, Homepage.class);
-//						startActivity(intent);
-					}
-					else {
-						Toast.makeText(context,"登录失败",Toast.LENGTH_SHORT).show();
-					}
-
-					break;
-				default:
-					break;
-			}
-		}
-	};
-
 
 }

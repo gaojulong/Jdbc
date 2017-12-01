@@ -50,6 +50,7 @@ public class SqlSentence {
 				msg.what=2;
 				msg.arg1=list.size();
 				Homepage.handler.sendMessage(msg);
+				Log.e("云端联系人","读取云端联系人"+list.size()+"条");
 			}
 		});
 		thread.start();
@@ -76,9 +77,6 @@ public class SqlSentence {
 				PreparedStatement ps=null;
 				ResultSet rs=null;
 
-				//定义msg，发送id到Login里
-				Message msg=new Message();
-				msg.what=1;//获取用户id
 				usid=-1;
 				try {
 					String sql="SELECT * from login WHERE username=? and password=?";
@@ -92,12 +90,8 @@ public class SqlSentence {
 						User.setLogin_flay(1);
 						Log.e("登录", "登录成功");
 						//发送
-						msg.arg1=usid;
-						login.handlerLogin.sendMessage(msg);
 					}else{
-					    msg.arg1=-1;
 						Log.e("登录", "登录失败");
-                        login.handlerLogin.sendMessage(msg);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

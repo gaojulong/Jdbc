@@ -47,10 +47,9 @@ public class Homepage extends Activity {
 		btsc.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-
 				//	SqlSentence.numberAllConten();
 				if(threadRun==false){
-					tv.setText("正在同步.......");
+					//上传手机里的联系人
 					update();
 				}else {
 					Toast.makeText(Homepage.this, "本次已经同步完成", Toast.LENGTH_SHORT).show();
@@ -68,6 +67,8 @@ public class Homepage extends Activity {
 					ArrayList<Phonenumber>location=gethostuser();
 					//列出在云端查到的联系人,写入前先判断手机里是否已经存在
 					ArrayList<Phonenumber> yunlist=SqlSentence.numberAllConten();
+					//存放云端和手机本地不同的联系人
+					ArrayList<Phonenumber> differentarr=new ArrayList<Phonenumber>();
 					//判断写入的条数
 					int conint=0;
 					for(Phonenumber u:yunlist){
@@ -77,21 +78,30 @@ public class Homepage extends Activity {
 							for(Phonenumber locu:location)
 							{
 								//判断如果本地不存在此联系人或者手机号不一样则写入本地通讯录
-								if(u.getPhonenumber()==locu.getPhonenumber()||u.getUsername()==locu.getUsername());
+								if(u.getPhonenumber()==locu.getPhonenumber()&&u.getUsername()==locu.getUsername());
 								{
 									flag=true;
+                                    Log.e("通讯已存在",locu.getUsername() + locu.getPhonenumber());
+									break;
 								}
 							}
 							if(flag){
-								Log.e("通讯已存在",u.getUsername() + u.getPhonenumber());
+//								Log.e("通讯已存在",u.getUsername() + u.getPhonenumber());
 
 							}else {
-								addLocalhostUser(u.getUsername(), u.getPhonenumber());
+								//addLocalhostUser(u.getUsername(), u.getPhonenumber());
+                                Phonenumber phonenumber=new Phonenumber(u.getUsername(), u.getPhonenumber());
+                                differentarr.add(phonenumber);
 								Log.e("写入的", u.getUsername() + u.getPhonenumber());
 								conint++;//写入的条数加1
 							}
 
 						}
+						//不同的联系人
+                    for (Phonenumber phonenumber:differentarr)
+                    {
+                        Log.e("不同的联系人",phonenumber.getUsername()+phonenumber.getPhonenumber());
+                    }
 						Log.e("写入多少条记录：",""+conint);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -112,6 +122,9 @@ public class Homepage extends Activity {
 				case 2:
 					int ind=msg.arg1;
 					tv.setText("云端记录"+ ind+"条");
+					break;
+				case 3:
+					tv.setText("正在同步.......");
 					break;
 				default:
 					break;
@@ -175,49 +188,58 @@ public class Homepage extends Activity {
 	//上传通讯录
 	public  void  update(){
 		try {
-			//查询本地联系人
-			ArrayList<Phonenumber>location1=gethostuser();
-			//列出在云端查到的联系人,写入前先判断手机里是否已经存在
-			ArrayList<Phonenumber> yunlist1=SqlSentence.numberAllConten();
-			//存放云数据库中没有，将要上传的的联系人
-			ArrayList<Phonenumber> differentarr=new ArrayList<Phonenumber>();
-			//判断上传的条数
-			int upconint=0;
-			for(Phonenumber loca:location1){
-				//是否本地存在用户
-				boolean flag=false;
-				Log.e("云端联系人", loca.getUsername()+loca.getPhonenumber());
-				for(Phonenumber yun:yunlist1)
-				{
-					//判断如果本地不存在此联系人或者手机号不一样则写入本地通讯录
-					if(loca.getPhonenumber()==yun.getPhonenumber()||loca.getUsername()==yun.getUsername());
-					{
-						flag=true;
-						break;
-					}
-				}
-				if(flag){
-					Log.e("云端联系人已存在",loca.getUsername() + loca.getPhonenumber());
-
-				}else {
-					//把不在云数据库的号码上传
-					Phonenumber phonenumber1=new Phonenumber(User.getId(),loca.getUsername(),  loca.getPhonenumber());
-					differentarr.add(phonenumber1);
-					//					SqlSentence.insetPhoneNumber(phonenumber1);//上传通讯录
-					upconint++;
-				}
-			}
-			SqlSentence.insetPhoneNumber(differentarr);
+            int upconint=0;
+            upconint=updiff().size();
+            //把数组里联系人上传
+			SqlSentence.insetPhoneNumber(updiff());
 			Message msg=new Message();
 			msg.what=1;
 			msg.arg1=upconint;
 			handler.sendMessage(msg);
 			threadRun=true;
-			Log.e("上传多少条记录：",""+upconint);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	//查找出需要上传联系人
+        public ArrayList<Phonenumber> updiff(){
+            //查询本地联系人
+            ArrayList<Phonenumber>location1=gethostuser();
+            //列出在云端查到的联系人,写入前先判断手机里是否已经存在
+            ArrayList<Phonenumber> yunlist1=SqlSentence.numberAllConten();
+            //存放云数据库中没有，将要上传的的联系人
+            ArrayList<Phonenumber> differentarr=new ArrayList<Phonenumber>();
+            //判断上传的条数
+            int upconint=0;
+            boolean flag=false;
+            //查找出不再云数据库中的联系人
+            for (int i=0;i<location1.size();i++)
+            {
+                flag=false;
+                for (int j=0;j<yunlist1.size();j++)
+                {
+                    if(location1.get(i).getUsername().equals(yunlist1.get(j).getUsername())&&
+                            location1.get(i).getPhonenumber().equals(yunlist1.get(j).getPhonenumber()))
+                    {
+                        flag=true;
+                        break;
+                    }
+                }
+                if (flag==true)
+                {
+                    //Log.e("联系人在云端已经存在",location1.get(i).getUsername()+ location1.get(i).getPhonenumber());
+                }
+                else {
+                    //把不在云数据库的号码上传
+                    Phonenumber phonenumber1 = new Phonenumber(User.getId(), location1.get(i).getUsername(), location1.get(i).getPhonenumber());
+                    differentarr.add(phonenumber1);
+                    upconint++;
+                }
+            }
+            Log.e("需要上传联系人的数量：","需要上传"+upconint+"个");
+            return differentarr;
+        }
+
 
 	@Override
 	protected void onPause() {
