@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import android.os.Message;
 import android.util.Log;
 
+import com.lovelqq.julong.jdbc.GetTime.AbstractMethod;
 import com.lovelqq.julong.jdbc.user.Phonenumber;
 import com.lovelqq.julong.jdbc.user.User;
 import com.lovelqq.julong.jdbc.userlogin.Homepage;
@@ -67,7 +68,6 @@ public class SqlSentence {
 	 * usid返回查到的用户ID
 	 */
 	private static int usid;
-    private  static Login login=new Login();
 	public static int  loginuser(final User user) {
 		Thread thread=new Thread(new Runnable() {
 			@Override
@@ -75,7 +75,6 @@ public class SqlSentence {
 				Connection conn=null;
 				PreparedStatement ps=null;
 				ResultSet rs=null;
-
 				usid=-1;
 				try {
 					String sql="SELECT * from login WHERE username=? and password=?";
@@ -83,6 +82,53 @@ public class SqlSentence {
 					ps=conn.prepareStatement(sql);
 					ps.setString(1,user.getUsername());
 					ps.setString(2, user.getPassword());
+					rs=ps.executeQuery();
+					if (rs.next()) {
+						usid=rs.getInt("userid");
+						User.setLogin_flay(1);
+						Log.e("登录", "登录成功");
+						//发送
+					}else{
+						Log.e("登录", "登录失败");
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					Log.e("数据库连接", "连接失败");
+				}finally{
+					JdbcUtils.freeResorce(conn, ps, rs);
+				}
+			}
+		});
+		thread.start();
+
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return usid;
+	}
+
+	/**
+	 * 查找用户的id
+	 * 传进来openid
+	 * @param openid
+	 * @return
+	 */
+	public static int  loginuser(final String openid) {
+		Thread thread=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Connection conn=null;
+				PreparedStatement ps=null;
+				ResultSet rs=null;
+				usid=-1;
+				try {
+					String sql="SELECT * from login WHERE openid=? ";
+					conn=JdbcUtils.getconnection();
+					ps=conn.prepareStatement(sql);
+					ps.setString(1,openid);
 					rs=ps.executeQuery();
 					if (rs.next()) {
 						usid=rs.getInt("userid");
@@ -156,6 +202,34 @@ public class SqlSentence {
 		return flage1;
 	}
 	/**
+	 * 没有opened，进行注册
+	 */
+	public static void insetUser(final String openid) {
+		Thread thread=new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Connection conn=null;
+				PreparedStatement ps=null;
+				ResultSet rs=null;
+				try {
+						conn=JdbcUtils.getconnection();
+						String sql1="INSERT INTO login(openid) VALUES(?)";
+						ps=conn.prepareStatement(sql1);
+						ps.setString(1, openid);
+						//受影响的行数
+						int re=ps.executeUpdate();
+						System.out.println("受影响行数"+re);
+				} catch (Exception e) {
+					e.printStackTrace();
+					Log.e("数据库连接", "连接失败");
+				}finally{
+					JdbcUtils.freeResorce(conn, ps, rs);
+				}
+			}
+		});
+		thread.start();
+	}
+	/**
 	 * 注册用户
 	 * @param user
 	 * 2表示已有此用户
@@ -215,7 +289,6 @@ public class SqlSentence {
                 PreparedStatement ps=null;
                 //正在上传的个数
                 int i=0;
-
                 try {
                     for (Phonenumber phone:Phonenumber)
                     {
@@ -251,4 +324,5 @@ public class SqlSentence {
         });
         thread.start();
     }
+
 }

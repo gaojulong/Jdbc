@@ -81,7 +81,6 @@ public class Homepage extends Activity {
 		});
 	}
 
-
 	public static Handler handler=new Handler(){
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {

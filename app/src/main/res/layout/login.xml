@@ -8,6 +8,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="登录页面"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FF0000"
+        android:text="郑重声明：本软件用于开发学习，不可依赖使用。"/>
     <LinearLayout
 
         android:layout_width="wrap_content"
@@ -20,11 +25,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="用户名："/>
+
         <EditText
             android:id="@+id/loginusername"
-            android:text="lqq"
             android:layout_width="150dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
@@ -36,11 +41,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="密   码："/>
+
         <EditText
+            android:inputType="textPassword"
             android:id="@+id/loginpassword"
-            android:text="123456"
             android:layout_width="150dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
         <Button
@@ -52,8 +58,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="登录"/>
-    <Button
 
+    <Button
         android:id="@+id/loginQqbt"
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
@@ -61,6 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="QQ登录"/>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -76,7 +83,7 @@
 
         <Button
             android:id="@+id/zhaohuibt"
-            android:layout_marginLeft="190dp"
+            android:layout_marginLeft="150dp"
             android:background="@android:color/transparent"
             android:text="找回密码"
 

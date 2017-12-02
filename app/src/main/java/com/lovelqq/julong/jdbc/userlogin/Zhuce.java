@@ -78,7 +78,6 @@ public class Zhuce extends Activity {
 			}
 		});
 	}
-
 	public static Handler handler=new Handler(){
 		@Override
 		public void handleMessage(Message msg) {
