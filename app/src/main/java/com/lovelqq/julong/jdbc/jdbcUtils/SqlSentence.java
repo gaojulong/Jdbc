@@ -116,7 +116,7 @@ public class SqlSentence {
 	 * @param openid
 	 * @return
 	 */
-	public static int  loginuser(final String openid) {
+	public static int  loginopenid(final String openid) {
 		Thread thread=new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -140,7 +140,7 @@ public class SqlSentence {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
-					Log.e("数据库连接", "连接失败");
+					Log.e("数据库连接查找openid", "连接失败");
 				}finally{
 					JdbcUtils.freeResorce(conn, ps, rs);
 				}
@@ -204,30 +204,38 @@ public class SqlSentence {
 	/**
 	 * 没有opened，进行注册
 	 */
-	public static void insetUser(final String openid) {
+	//插入的返回值
+	private static int insetflag=-1;
+	public static int insetopenid(final String openid) {
 		Thread thread=new Thread(new Runnable() {
 			@Override
 			public void run() {
 				Connection conn=null;
 				PreparedStatement ps=null;
-				ResultSet rs=null;
 				try {
 						conn=JdbcUtils.getconnection();
-						String sql1="INSERT INTO login(openid) VALUES(?)";
-						ps=conn.prepareStatement(sql1);
+						String sql="INSERT INTO login(openid) VALUES(?)";
+						ps=conn.prepareStatement(sql);
 						ps.setString(1, openid);
 						//受影响的行数
-						int re=ps.executeUpdate();
-						System.out.println("受影响行数"+re);
+						insetflag=ps.executeUpdate();
+						System.out.println("受影响行数"+insetflag);
 				} catch (Exception e) {
 					e.printStackTrace();
-					Log.e("数据库连接", "连接失败");
+					Log.e("数据库连接openid注册", "连接失败");
 				}finally{
-					JdbcUtils.freeResorce(conn, ps, rs);
+					JdbcUtils.freeResorce(conn, ps, null);
 				}
 			}
 		});
 		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return insetflag;
 	}
 	/**
 	 * 注册用户
@@ -276,6 +284,12 @@ public class SqlSentence {
 			}
 		});
 		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * 上传手机号

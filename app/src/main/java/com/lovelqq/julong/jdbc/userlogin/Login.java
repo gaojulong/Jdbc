@@ -102,7 +102,6 @@ public class Login extends Activity implements OnClickListener{
 			Log.e("登陆信息", "登陆信息"+values.toString());
 			//获取用户openid
 			initOpenidAndToken(values);
-			Toast.makeText(context,openId,Toast.LENGTH_SHORT).show();
 			//回调获取openID进行登录
 			qqlogin();
 			//获取用户信息
@@ -184,24 +183,28 @@ public class Login extends Activity implements OnClickListener{
 	//第三方QQ登录
 	private void qqlogin(){
 		Log.e("OPENID","openid进行查找");
-		User.id= SqlSentence.loginuser(openId);
-		Log.e("登录获取","userid"+User.getId()+"在线标识"+User.getLogin_flay());
+		User.id=SqlSentence.loginopenid(openId);
+		Log.e("useeid",User.id+"");
 		if (User.id!=-1) {
+            Toast.makeText(context,"QQ登录成功",Toast.LENGTH_SHORT).show();
 			Intent intent = new Intent(Login.this, Homepage.class);
 			startActivity(intent);
 		}
 		else {
-			//未查到openid，进行注册openid
-			SqlSentence.insetUser(openId);
-			//再次查找用户ID
-			User.id= SqlSentence.loginuser(openId);
-			Log.e("登录获取","userid"+User.getId()+"在线标识"+User.getLogin_flay());
-			if (User.id!=-1) {
-				Intent intent = new Intent(Login.this, Homepage.class);
-				startActivity(intent);
-			}
-			//Toast.makeText(Login.this,"用户名和密码不匹配",Toast.LENGTH_SHORT).show();
-			//注册一个新用户
+			//不存在openid用户，注册openid用户,返回受影响的行数
+			int i=SqlSentence.insetopenid(openId);
+			if(i>0){
+                User.id=SqlSentence.loginopenid(openId);
+                Log.e("注册useeid，再进行查询openid",User.id+"");
+                if (User.id!=-1) {
+                    Toast.makeText(context,"首次QQ登录成功",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(Login.this, Homepage.class);
+                    startActivity(intent);
+                }
+            }
+            else {
+                Toast.makeText(context,"QQ登录失败",Toast.LENGTH_SHORT).show();
+            }
 		}
 
 	}
