@@ -9,12 +9,13 @@
         android:layout_gravity="center"
         android:text="登录页面"/>
     <TextView
+        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FF0000"
         android:text="郑重声明：本软件用于开发学习，不可依赖使用。"/>
     <LinearLayout
-
+        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -35,6 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_gravity="center"
         android:layout_marginTop="30dp">
         <TextView
             android:paddingLeft="40dp"
@@ -68,28 +70,32 @@
         android:layout_height="wrap_content"
         android:text="QQ登录"/>
 
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="80dp">
-        <Button
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center">
 
-            android:id="@+id/zhucebt"
-            android:layout_width="wrap_content"
-            android:background="@android:color/transparent"
-            android:layout_height="wrap_content"
-            android:text="注册"/>
+            <Button
+                android:id="@+id/zhucebt"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:background="@android:color/transparent"
+                android:layout_height="wrap_content"
+                android:text="注册"/>
 
-        <Button
-            android:id="@+id/zhaohuibt"
-            android:layout_marginLeft="150dp"
-            android:background="@android:color/transparent"
-            android:text="找回密码"
+            <Button
+                android:id="@+id/zhaohuibt"
+                android:background="@android:color/transparent"
+                android:layout_marginLeft="150dp"
+                android:text="找回密码"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
 
 
 

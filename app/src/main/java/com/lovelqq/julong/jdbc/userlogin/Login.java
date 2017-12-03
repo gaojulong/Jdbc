@@ -80,6 +80,8 @@ public class Login extends Activity implements OnClickListener{
 				login();
 				break;
 			case R.id.loginQqbt:
+				//设置点击间隔不小于2秒
+				if (LoginUtils.isFastClick())
 				//第三方QQ登录
 				mTencent.login(Login.this, "all", listener);
 				break;

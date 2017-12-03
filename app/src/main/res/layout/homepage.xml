@@ -4,18 +4,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-      <TextView 
+      <TextView
+          android:layout_marginTop="50dp"
+          android:layout_gravity="center"
           android:id="@+id/tv"
-          android:textSize="15dp"
+          android:textSize="30dp"
           android:textColor="#FF6347"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"/>
     <Button
+        android:layout_gravity="center"
         android:id="@+id/btsc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="上传通信录"/>
     <Button
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
         android:id="@+id/btxz"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
