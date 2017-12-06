@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -15,7 +13,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.lovelqq.julong.jdbc.R;
-import com.lovelqq.julong.jdbc.jdbcUtils.LoginUtils;
+import com.lovelqq.julong.jdbc.jdbcUtils.ButtonUtils;
 import com.lovelqq.julong.jdbc.jdbcUtils.SqlSentence;
 import com.lovelqq.julong.jdbc.jdbcUtils.ValidateUserPut;
 import com.lovelqq.julong.jdbc.user.User;
@@ -76,12 +74,12 @@ public class Login extends Activity implements OnClickListener{
 				break;
 			case R.id.loginbt:
 				//设置点击间隔不小于2秒
-				if (LoginUtils.isFastClick())
+				if (ButtonUtils.isFastClick())
 				login();
 				break;
 			case R.id.loginQqbt:
 				//设置点击间隔不小于2秒
-				if (LoginUtils.isFastClick())
+				if (ButtonUtils.isFastClick())
 				//第三方QQ登录
 				mTencent.login(Login.this, "all", listener);
 				break;
