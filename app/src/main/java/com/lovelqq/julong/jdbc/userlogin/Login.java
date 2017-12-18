@@ -70,7 +70,7 @@ public class Login extends Activity implements OnClickListener{
 				startActivity(intent);
 				break;
 			case R.id.zhaohuibt:
-
+				SqlSentence.loginuse(edusernaem.getText().toString(),edpassword.getText().toString());//测试连接数据库回调
 				break;
 			case R.id.loginbt:
 				//设置点击间隔不小于2秒
@@ -220,6 +220,7 @@ public class Login extends Activity implements OnClickListener{
 				User user=new User(strname,strpassw);
 				//在这给查找用户id，复制给User.id
 				User.id= SqlSentence.loginuser(user);
+				//User.id=SqlSentence.loginuse(strname,strpassw);
 				Log.e("登录获取","userid"+User.getId()+"在线标识"+User.getLogin_flay());
 				if (User.id!=-1) {
 					Intent intent = new Intent(Login.this, Homepage.class);

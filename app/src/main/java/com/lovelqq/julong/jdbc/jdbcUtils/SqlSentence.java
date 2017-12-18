@@ -3,6 +3,7 @@ package com.lovelqq.julong.jdbc.jdbcUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import android.os.Message;
@@ -67,7 +68,7 @@ public class SqlSentence {
 	 * @param user
 	 * usid返回查到的用户ID
 	 */
-	private static int usid;
+	private static int usid=-1;
 	public static int  loginuser(final User user) {
 		Thread thread=new Thread(new Runnable() {
 			@Override
@@ -326,8 +327,6 @@ public class SqlSentence {
                     msg1.what=1;
                     msg1.arg1=Phonenumber.size();
                     Homepage.handler.sendMessage(msg1);
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.e("数据库连接", "连接失败");
@@ -338,5 +337,79 @@ public class SqlSentence {
         });
         thread.start();
     }
+	/**
+	 * 连接数据库
+	 */
+	public static void connecSql(final Connec coninter){
+		Thread threadCon =new Thread(new Runnable() {
+			//Connection conn=null;
+			@Override
+			public void run() {
+				try {
+					conn=JdbcUtils.getconnection();
+					coninter.OnSucceed(conn);
+					coninter.Onclossql();
+				} catch (Exception e) {
+					e.printStackTrace();
+					coninter.OnError(e);
+				}
+			}
+		});
+		threadCon.start();
+	}
+
+
+	/**
+	 * 用户登录验证
+	 * @param name 用户名
+	 * @param pswd	密码
+	 */
+	private  static Connection conn=null;
+	private  static PreparedStatement ps=null;
+	private  static ResultSet rs=null;
+	public static int loginuse(final String name, final String pswd){
+		connecSql(new Connec() {
+			@Override
+			public void OnSucceed(Connection conn) throws SQLException {
+				Log.e("连接测试", "成功");
+				String sql="SELECT * from login WHERE username=? and password=?";
+				ps=conn.prepareStatement(sql);
+					ps.setString(1,name);
+					ps.setString(2,pswd);
+					rs=ps.executeQuery();
+					if (rs.next()) {
+						usid=rs.getInt("userid");
+						Log.e("登录", "登录成功");
+						//发送
+					}else{
+						Log.e("登录", "登录失败");
+					}
+
+			}
+
+			@Override
+			public void OnError(Exception e) {
+				Log.e("连接测试", "失败");
+			}
+
+			@Override
+			public void Onclossql() {
+				JdbcUtils.freeResorce(conn, ps, rs);
+				Log.e("连接测试", "数据库关闭");
+			}
+		});
+
+		return usid;
+	}
 
 }
+
+/**
+ * 连接数据库成功后回调的接口
+ */
+interface Connec{
+	public void OnSucceed(Connection conn)throws SQLException;
+	public void OnError(Exception e);
+	public void Onclossql();
+}
+
